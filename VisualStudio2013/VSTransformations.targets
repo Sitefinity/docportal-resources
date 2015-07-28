@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" >
+	<PropertyGroup>
+		<QueryPeek>/configuration/appSettings/add</QueryPeek>
+		<QueryPoke>/configuration/appSettings</QueryPoke>
+		<WebConfigLocation>$(MSBuildProjectDirectory)\web.config</WebConfigLocation>
+	</PropertyGroup>
+
+  <!-- When a Sitefinity project is opened in Visual Studio 2013 and the debug flag set to true in the web.config file 
+  an exception will be thrown when a new General Product is created in the backend 
+  http://www.sitefinity.com/developer-network/knowledge-base/create-product-value-cannot-be-null-exception-when-the-project-is-included-into-an-empty-solution-in-visual-studio-2013
+  Steps to integrate with Sitefinity.
+  1. Add the target file to your project.
+  2. Open SitefinityWebApp.csproj and add the following import that points to the "targets file"
+  <Import Project="$(SolutionDir)\VSTransformations.targets" Condition="Exists('$(SolutionDir)\VSTransformations.targets')" />
+  3. Call the targed before build the project. The target is executed when VSTransformations.targets file is found, Visual Studio Version is 12 (2013), you build inside Visual Studio and you build in Debug mode.
+    <Target Name="BeforeBuild">
+      <CallTarget Condition="Exists('$(SolutionDir)\VSTransformations.targets') And '$(VisualStudioVersion)' == '12.0' And '$(BuildingInsideVisualStudio)' == 'true' And '$(Configuration)' == 'Debug'" Targets="DisableBrowserLinkSetting" />
+    </Target>
+  -->
+	<Target Name="DisableBrowserLinkSetting">
+	  
+    <Message Text="DisableBrowserLinkSetting has been called. Start executing target code" />
+		<Message Text="WebConfigLocation is set to '$(WebConfigLocation)'" />
+		<Message Text="VS version is set to'$(VisualStudioVersion)'"/>
+		<Message Text="Build inside VisualStudio is set to '$(BuildingInsideVisualStudio)'"/>
+		<Message Text="Configuration is set to '$(Configuration)'"/>
+    
+    <!--Remove read only attribute from the web.config, otherwise you cannot edit it.-->
+		<Exec Command="ATTRIB -R &quot;$(WebConfigLocation)&quot;" />
+    
+		<XmlPeek XmlInputPath="$(WebConfigLocation)" Query="$(QueryPeek)" >
+		  <Output TaskParameter="Result" PropertyName="CurrentAddNodes" />
+		</XmlPeek>
+
+		<PropertyGroup>
+		  <NodeName>add</NodeName>
+		  <KeyAttributeName>key</KeyAttributeName>
+		  <KeyAttributeValue>vs:EnableBrowserLink</KeyAttributeValue>
+		  <ValueAttributeName>value</ValueAttributeName>
+		  <ValueAttributeValue>false</ValueAttributeValue>
+		  <NewAddNode>&lt;$(NodeName) $(KeyAttributeName)&#61;&quot;$(KeyAttributeValue)&quot; $(ValueAttributeName)&#61;&quot;$(ValueAttributeValue)&quot;/&gt;</NewAddNode>
+		  <CurrentNodesString>$(CurrentAddNodes.Replace(';', ' '))</CurrentNodesString>
+		  <ConcatenatedNodes>$(CurrentNodesString)$(NewAddNode)</ConcatenatedNodes>
+		</PropertyGroup>
+
+		<XmlPoke Condition="$(CurrentNodesString.Contains('vs:EnableBrowserLink')) == false" 
+			Value="$(ConcatenatedNodes)" 
+			XmlInputPath="$(WebConfigLocation)" 
+			Query="$(QueryPoke)">
+		</XmlPoke>
+		
+	</Target>
+</Project>
