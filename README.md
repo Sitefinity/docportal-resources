@@ -1,4 +1,4 @@
 docportal-resources
 ===================
 
-Contains documents for the Sitefinity Documentation Portal
+Contains documents for the [Progress Sitefinity CMS Documentation Portal](http://docs.sitefinity.com/)
