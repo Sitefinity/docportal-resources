@@ -118,7 +118,7 @@ Write-Host "Features installed." -Foregroundcolor Green
 #Register ASP.NET 4.0 with IIS
 Write-Host "Registering ASP.NET 4.0 with IIS…" -Foregroundcolor Yellow
 Start-Process -FilePath $aspnetRegIISFullName  -ArgumentList "-iru"      
-       
+            
 #Register Web Handlers
 if(!(Get-WebHandler "xamlx-ISAPI-4.0_32bit")){
     New-WebHandler -Name "xamlx-ISAPI-4.0_32bit" -Path "*.xamlx" -Verb "GET,HEAD,POST,DEBUG" -RequiredAccess "Script" -Modules "IsapiModule" -Precondition "classicMode,runtimeVersionv4.0,bitness32" -ScriptProcessor "C:\Windows\Microsoft.NET\Framework\v4.0.30319\aspnet_isapi.dll"
@@ -135,7 +135,7 @@ if(!(Get-WebHandler "svc-ISAPI-4.0_32bit")){
 if(!(Get-WebHandler "svc-ISAPI-4.0_64bit")){
     New-WebHandler -Name "svc-ISAPI-4.0_64bit" -Path "*.svc" -Verb "*" -RequiredAccess "Script" -Modules "IsapiModule" -Precondition "classicMode,runtimeVersionv4.0,bitness64" -ScriptProcessor "C:\Windows\Microsoft.NET\Framework64\v4.0.30319\aspnet_isapi.dll"
 }
-     
+
 Write-Host "Setup complete." -Foregroundcolor Green
 # SIG # Begin signature block
 # MIIXkwYJKoZIhvcNAQcCoIIXhDCCF4ACAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
